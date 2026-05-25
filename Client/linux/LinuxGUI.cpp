@@ -40,9 +40,17 @@ void EnterGUIMainLoop(BluetoothWrapper bt)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create window with graphics context
-    GLFWwindow *window = glfwCreateWindow(GUI_WIDTH, GUI_HEIGHT, APP_NAME, NULL, NULL);
-    if (window == NULL)
-        return;
+    //GLFWwindow *window = glfwCreateWindow(GUI_WIDTH, GUI_HEIGHT, APP_NAME, NULL, NULL);
+    //if (window == NULL)
+    //    return;
+    // tamaño inicial más razonable
+    GLFWwindow *window = glfwCreateWindow(
+        780,
+        700,
+        APP_NAME,
+        NULL,
+        NULL
+    );
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
@@ -71,26 +79,59 @@ void EnterGUIMainLoop(BluetoothWrapper bt)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    //ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(
+    0.06f,
+    0.06f,
+    0.07f,
+    1.0f
+    );
+
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-
         glfwPollEvents();
 
-        // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
-        // perform gui pass
+        ImGui::NewFrame();
+
         GUI.performGUIPass();
 
+        ImGui::Render();
+
         int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwGetFramebufferSize(
+            window,
+            &display_w,
+            &display_h
+        );
+
+        glViewport(
+            0,
+            0,
+            display_w,
+            display_h
+        );
+
+        glClearColor(
+            clear_color.x,
+            clear_color.y,
+            clear_color.z,
+            clear_color.w
+        );
+
+        glClear(
+            GL_COLOR_BUFFER_BIT |
+            GL_DEPTH_BUFFER_BIT
+        );
+
+        ImGui_ImplOpenGL3_RenderDrawData(
+            ImGui::GetDrawData()
+        );
 
         glfwSwapBuffers(window);
     }

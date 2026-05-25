@@ -31,12 +31,13 @@ LinuxBluetoothConnector::~LinuxBluetoothConnector()
 int LinuxBluetoothConnector::recv(char *buf, size_t length)
 {
   size_t read = ::read(this->_socket, buf, length);
-  // printf("length: %ld, read: %ld\n", length, read);
-  // for (int i = 0; i < read; i++)
-  // {
-  //   std::cout << std::setfill('0') << std::setw(2) << std::hex << (0xff & (unsigned int)buf[i]) << " ";
-  // }
-  // std::cout << '\n';
+  printf("RX length: %ld read: %ld\n", length, read);
+
+  for (int i = 0; i < read; i++)
+  {
+      printf("%02X ", (unsigned char)buf[i]);
+  }
+  printf("\n");
   return read;
 }
 
@@ -44,12 +45,13 @@ int LinuxBluetoothConnector::send(char *buf, size_t length)
 {
 
   size_t written = ::write(this->_socket, buf, length);
-  // printf("length: %ld, written: %ld\n", length, written);
-  // for (int i = 0; i < written; i++)
-  // {
-  //   std::cout << std::setfill('0') << std::setw(2) << std::hex << (0xff & (unsigned int)buf[i]) << " ";
-  // }
-  // std::cout << '\n';
+  printf("TX length: %ld written: %ld\n", length, written);
+
+  for (int i = 0; i < written; i++)
+  {
+      printf("%02X ", (unsigned char)buf[i]);
+  }
+  printf("\n");
   return written;
 }
 

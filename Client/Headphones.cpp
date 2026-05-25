@@ -84,15 +84,20 @@ void Headphones::setChanges()
 		auto ncAsmEffect = this->_ambientSoundControl.desired ? NC_ASM_EFFECT::ADJUSTMENT_COMPLETION : NC_ASM_EFFECT::OFF;
 		auto asmId = this->_focusOnVoice.desired ? ASM_ID::VOICE : ASM_ID::NORMAL;
 		auto asmLevel = this->_ambientSoundControl.desired ? this->_asmLevel.desired : ASM_LEVEL_DISABLED;
+		printf("Sending NC/ASM command\n");
 
-		this->_conn.sendCommand(CommandSerializer::serializeNcAndAsmSetting(
-			ncAsmEffect,
-			NC_ASM_SETTING_TYPE::LEVEL_ADJUSTMENT,
-			ASM_SETTING_TYPE::LEVEL_ADJUSTMENT,
-			asmId,
-			asmLevel
-		));
-		
+		auto packet =
+   		CommandSerializer::serializeNcAndAsmSetting(
+        ncAsmEffect,
+        NC_ASM_SETTING_TYPE::LEVEL_ADJUSTMENT,
+        ASM_SETTING_TYPE::LEVEL_ADJUSTMENT,
+        asmId,
+        asmLevel
+		);
+
+		printf("NC/ASM packet\n");
+
+		this->_conn.sendCommand(packet);
 		std::lock_guard guard(this->_propertyMtx);
 		this->_ambientSoundControl.fulfill();
 		this->_asmLevel.fulfill();
@@ -125,8 +130,16 @@ void Headphones::setChanges()
 				throw std::logic_error("it's impossible that both values were changed to zero and were also previously zero");
 			}
 		}
+		printf("Sending NC/ASM command\n");
+		auto packet =
+			CommandSerializer::serializeVPTSetting(
+				command,
+				preset
+		);
 
-		this->_conn.sendCommand(CommandSerializer::serializeVPTSetting(command, preset));
+		printf("VPT packet\n");
+
+		this->_conn.sendCommand(packet);
 
 		std::lock_guard guard(this->_propertyMtx);
 		this->_vptType.fulfill();

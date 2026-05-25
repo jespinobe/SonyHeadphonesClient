@@ -16,7 +16,8 @@ inline unsigned char SERVICE_UUID_IN_BYTES[] = { // this is the SERVICE_UUID but
 
 #define APP_NAME "Sony Headphones App v" __HEADPHONES_APP_VERSION__
 #define APP_NAME_W (L"" APP_NAME)
-
+inline constexpr int GUI_WIDTH = 900;
+inline constexpr int GUI_HEIGHT = 720;
 using Buffer = std::vector<char>;
 
 enum class DATA_TYPE : signed char
