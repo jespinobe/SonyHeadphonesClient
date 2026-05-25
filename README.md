@@ -118,6 +118,10 @@ Debian / Ubuntu:
 sudo apt install libbluetooth-dev libglew-dev libglfw3-dev libdbus-1-dev
 ```
 
+si falla  usar "cmake .."  usar "cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+
+    
+
 Fedora:
 ```bash
 sudo dnf install bluez-libs-devel glew-devel glfw-devel dbus-devel
