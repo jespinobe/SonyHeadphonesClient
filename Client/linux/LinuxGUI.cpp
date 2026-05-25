@@ -25,9 +25,16 @@ void EnterGUIMainLoop(BluetoothWrapper bt)
 
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-        return;
 
+    // GLEW usa GLX y necesita X11/XWayland.
+    // Forzar X11 incluso dentro de sesiones Wayland.
+    glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+
+    if (!glfwInit())
+    {
+        fprintf(stderr, "Failed to initialize GLFW\n");
+        return;
+    }
     const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -40,10 +47,14 @@ void EnterGUIMainLoop(BluetoothWrapper bt)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    bool err = glewInit() != GLEW_OK;
-    if (err)
+    glewExperimental = GL_TRUE;
+
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
     {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+        fprintf(stderr,
+            "GLEW error: %s\n",
+            glewGetErrorString(err));
         return;
     }
 
