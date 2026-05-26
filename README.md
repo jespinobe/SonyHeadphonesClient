@@ -1,145 +1,318 @@
-# Archival
+# Sony Headphones Client (Enhanced Fork)
 
-This project is now archived. Thanks to all the users - I hope that you had as much fun using it as I had making it :)
+This project is a maintained fork of the original Sony Headphones Client by Plutoberth.
 
-I was very happy to see that this program, originally created out of my own need, turned out to be useful to so many people.
+The original project was archived, so this fork continues development with fixes, Linux improvements, UI enhancements and better compatibility with modern systems.
 
-The app will, of course, continue to work indefinitely for the devices it supports.
-
-
-There are some forks that add support for other devices, like WF-1000XM5 or WH-1000XM4 - they might work, but I haven't tested or reviewed them myself. You're welcome to try those if your device is unsupported.
-
-# Archived Page
-<p class="aligncenter">
-  <a href="https://github.com/Plutoberth/SonyHeadphonesClient">
-    <!-- img src="" alt="Logo" width="80" height="80"-->
-  </a>
-
+<p align="center">
   <h1 align="center">Sony Headphones Client</h1>
 
-  This project features a PC alternative for the mobile-only Sony Headphones app.
-  <br/><br/>
-  <img width="556" src="static/showcase.gif" alt="Program Showcase"><p> <br/>
+A desktop alternative to Sony's mobile-only Headphones app.
 
-  [![macOS](https://github.com/plutoberth/sonyheadphonesclient/actions/workflows/xcodebuild.yml/badge.svg)](https://github.com/Plutoberth/SonyHeadphonesClient/actions/workflows/xcodebuild.yml)
-  [![Linux & Windows](https://github.com/plutoberth/sonyheadphonesclient/actions/workflows/cmake.yml/badge.svg)](https://github.com/Plutoberth/SonyHeadphonesClient/actions/workflows/cmake.yml)
-  [![Github all releases](https://img.shields.io/github/downloads/Plutoberth/SonyHeadphonesClient/total.svg)](https://GitHub.com/Plutoberth/SonyHeadphonesClient/releases/)
-  [![Donate](static/badge.svg)](https://paypal.me/plutoberth)
-  <br/>
+Manage Sony headphone settings directly from Linux, Windows and macOS.
+
+Improved fork with a modernized interface and enhanced Linux support.
+
 </p>
 
-<!-- TABLE OF CONTENTS -->
-## Table of Contents
+---
 
-* [Disclaimer](#disclaimer)
-* [Download](#download)
-* [Motivation](#motivation)
-* [Features](#features)
-* [Supported Platforms](#supported-platforms-and-headsets)
-* [For Developers](#for-developers)
-* [Contributors](#contributors)
-* [License](#license)
+## What's New In This Fork
 
-<!-- disclaimer -->
-## Disclaimer
+### UI Improvements
+- Redesigned and cleaner interface
+- Full-screen adaptive layout
+- Improved spacing and readability
+- Better organization of settings sections
+- Improved status display and connection information
+- Better visual feedback while commands are being sent
 
-### THIS PROGRAM IS NOT AFFILIATED WITH SONY. YOU ARE RESPONSIBLE FOR ANY DAMAGE THAT MAY OCCUR WHILE USING THIS PROGRAM.
+### Linux Improvements
+- Improved compatibility with Wayland
+- Better Bluetooth connection handling
+- Fixed listener initialization issues
+- Proper background thread startup
+- Fixed application hanging on exit
+- Better asynchronous handling
 
-## Download
+### Device Improvements
+- Better support for WH-1000XM4
+- Automatic state querying after connection
+- Capability refresh after connection
+- Improved initialization sequence
+- More reliable command transmission
 
-You can download compiled versions of the client from the [releases page](https://github.com/Plutoberth/SonyHeadphonesClient/releases).
+### Stability Improvements
+- Reduced duplicate command sending
+- Settings are only sent when values actually change
+- Better error handling
+- Improved disconnect handling
+- Background processes terminate correctly
 
-**Note:** If you're getting an error like `VCRUNTIME140_1.dll was not found`, you need to install the `Microsoft VC++ Redistributable`.
-
-## Motivation
-
-I recently bought the WH-1000-XM3s, and I was annoyed by the fact that I couldn't change their settings while using my PC.
-So I reverse-engineered the application (for intercompatibility purposes, of course), defined the protocol, and created with an alternative application with [Mr-M33533K5](https://github.com/Mr-M33533K5).
+---
 
 ## Features
 
 - [x] Ambient Sound Control
-- [x] Disabling noise cancelling
-- [x] Virtual Sound - VPT and Sound Position
-- [ ] Display battery life and fetch existing settings from device
+- [x] Noise Cancelling Control
+- [x] Speak To Chat
+- [x] Multipoint Device Controls
+- [x] Virtual Sound / VPT
+- [x] Sound Position
+- [x] Optimizer
+- [x] Improved Linux Bluetooth support
+- [x] WH-1000XM4 improvements
+- [ ] Battery display
 - [ ] Equalizer
+- [ ] Reading all existing device settings
 
-## Supported Platforms And Headsets
+---
 
-* WH-1000-XM3: Fully works and supported
-* [WH-1000-XM4](https://github.com/Plutoberth/SonyHeadphonesClient/issues/29#issuecomment-792459162): Partially works, more work is needed
-* [MDR-XB950BT](https://github.com/Plutoberth/SonyHeadphonesClient/issues/29#issuecomment-804292227): Fully works
-* And more! Check out [Headset Reports](https://github.com/Plutoberth/SonyHeadphonesClient/issues/29)
+## Supported Platforms
 
-#### **Please report about your experiences using other Sony headsets in the [Headset Reports](https://github.com/Plutoberth/SonyHeadphonesClient/issues/29) issue.**
-
-- [x] Windows
 - [x] Linux
+- [x] Windows
 - [x] macOS
+- [x] Wayland
 - [ ] ~~TempleOS~~
 
-## For Developers
+---
 
-```git clone --recurse-submodules https://github.com/Plutoberth/SonyHeadphonesClient.git```
+## Supported Headsets
 
-Issue this incantation to fix submodule issues:
-```sh
+Known working devices:
+
+- WH-1000XM3
+- WH-1000XM4
+- MDR-XB950BT
+
+Other devices may work as well.
+
+Please report compatibility results.
+
+---
+
+## Screenshots
+
+Enhanced Linux UI:
+<p align="center">
+<img src="static/old-ui.png" width="45%">
+<img src="static/newUI.png" width="45%">
+</p>
+
+Original UI vs Enhanced Fork
+
+Modernized interface with:
+- improved layout
+- better Wayland compatibility
+- cleaner organization
+- enhanced Sony XM4 support
+
+---
+
+## Installation
+
+### Clone repository
+
+Use recursive clone:
+
+```bash
+git clone --recurse-submodules https://github.com/jespinobe/SonyHeadphonesClient.git
+```
+
+If submodules fail:
+
+```bash
 git submodule sync
-git submodule update
+git submodule update --init --recursive
 ```
 
-### Protocol Information
+---
 
-Some enums and data are present in the code. The rest has to be obtained either statically or dynamically.
+# Build Instructions
 
-Sniffing messages - See [this helpful comment](https://github.com/Plutoberth/SonyHeadphonesClient/pull/36#issuecomment-795633877) by @guilhermealbm.
-
-### Compiling
-
-#### Windows
-Install [cmake](https://cmake.org/download/) (3.29.3 works) and install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/) the C++ components:
-* MSVC - VS 2022 C++ x64/x86 build tools
-* Windows SDK
-
-From within Visual Studio Run the `Tools --> Command Line --> Developer Command Prompt` and then:
-```
-cd Client
-mkdir build
-cd build
-cmake ..
-cmake --build .
-```
-
-#### Linux
+## Linux
 
 Debian / Ubuntu:
 
 ```bash
-sudo apt install libbluetooth-dev libglew-dev libglfw3-dev libdbus-1-dev
+sudo apt install \
+libbluetooth-dev \
+libglew-dev \
+libglfw3-dev \
+libdbus-1-dev
 ```
 
-si falla  usar "cmake .."  usar "cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+Create build directory:
 
-    
-
-Fedora:
 ```bash
-sudo dnf install bluez-libs-devel glew-devel glfw-devel dbus-devel
+cd Client
+mkdir build
+cd build
 ```
 
-#### macOS
+Configure:
 
-Use the provided xcodeproj file.
+```bash
+cmake ..
+```
+
+If CMake policy errors appear:
+
+```bash
+cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+```
+
+Compile:
+
+```bash
+cmake --build . -j$(nproc)
+```
+
+Run:
+
+```bash
+./SonyHeadphonesClient
+```
+
+---
+
+### Fedora
+
+```bash
+sudo dnf install \
+bluez-libs-devel \
+glew-devel \
+glfw-devel \
+dbus-devel
+```
+
+---
+
+## Windows
+
+Install:
+
+- Visual Studio Community 2022
+- C++ Desktop Components
+- Windows SDK
+- CMake
+
+Build:
+
+```bash
+cd Client
+mkdir build
+cd build
+
+cmake ..
+cmake --build .
+```
+
+---
+
+## macOS
+
+Use the provided Xcode project.
+
+---
+
+## Linux Notes
+
+If Bluetooth connects but controls do not appear:
+
+Verify:
+
+- Headphones are paired
+- Headphones are connected through BlueZ
+- RFCOMM service is discovered
+- Audio profile is active
+
+Useful commands:
+
+Check devices:
+
+```bash
+bluetoothctl devices
+```
+
+Connect manually:
+
+```bash
+bluetoothctl
+connect XX:XX:XX:XX:XX
+```
+
+Monitor Bluetooth logs:
+
+```bash
+journalctl -f | grep bluetooth
+```
+
+---
+
+## Development Notes
+
+This fork includes fixes for:
+
+### Listener startup
+
+Background listener now starts correctly:
+
+```cpp
+this->_listener =
+std::make_unique<Listener>(
+    this->_headphones,
+    this->_bt
+);
+```
+
+### Automatic state sync
+
+After connection:
+
+```cpp
+this->_headphones.queryState();
+```
+
+### Clean shutdown
+
+Background tasks now terminate correctly when application exits.
+
+---
+
+## Original Project
+
+Original archived repository:
+
+https://github.com/Plutoberth/SonyHeadphonesClient
+
+Huge thanks to everyone involved.
+
+---
 
 ## Contributors
 
-* [Plutoberth](https://github.com/Plutoberth) - Initial Work and Windows Version
-* [Mr-M33533K5](https://github.com/Mr-M33533K5) - BT Interface and Other Help
-* [semvis123](https://github.com/semvis123) - macOS Version
-* [jimzrt](https://github.com/jimzrt) - Linux Version
+Original:
+
+* [Plutoberth](https://github.com/Plutoberth) - Initial Work and Windows Version 
+* [Mr-M33533K5](https://github.com/Mr-M33533K5) - BT Interface and Other Help 
+* [semvis123](https://github.com/semvis123) - macOS Version * [jimzrt](https://github.com/jimzrt) - Linux Version 
 * [guilhermealbm](https://github.com/guilhermealbm) - Noise Cancelling Switch
 
-<!-- LICENSE -->
+Fork additions:
+
+- jespinobe
+- Linux UI redesign
+- Wayland support improvements
+- Bluetooth fixes
+- WH-1000XM4 improvements
+- Connection stability improvements
+
+---
+
 ## License
 
-Distributed under the [MIT License](https://github.com/Plutoberth/SonyHeadphonesClient/blob/master/LICENSE). See LICENSE for more information.
+Distributed under the MIT License.
+
+See LICENSE for more information.
