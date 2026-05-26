@@ -96,8 +96,7 @@ Please report compatibility results.
 
 Enhanced Linux UI:
 <p align="center">
-<img src="static/old-ui.png" width="45%">
-<img src="static/newUI.png" width="45%">
+<img src="static/newUI.png" width="1000">
 </p>
 
 Original UI vs Enhanced Fork
