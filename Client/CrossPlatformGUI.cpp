@@ -23,28 +23,6 @@ bool CrossPlatformGUI::performGUIPass()
     style.FramePadding = ImVec2(12,8);
     style.ItemSpacing = ImVec2(10,12);
 
-		if (this->_bt.isConnected())
-		{
-			unsigned int cap = this->_headphones.getCapabilities();
-
-			// ImGui::Spacing();
-			ImGui::Separator();
-			if (cap & DEVICE_CAPABILITIES::NC_ASM)
-				this->_drawASMControls();
-			if (cap & DEVICE_CAPABILITIES::VPT)
-				this->_drawSurroundControls();
-			if (cap & DEVICE_CAPABILITIES::SPEAK_TO_CHAT)
-				this->_drawSpeakToChat();
-			if (cap & DEVICE_CAPABILITIES::MULTI_POINT)
-				this->_drawMultiPointConn();
-			if (cap & DEVICE_CAPABILITIES::OPTIMIZER)
-				ImGui::Separator();
-				this->_drawOptimizerButton();
-
-			this->_setHeadphoneSettings();
-		}
-	
-
 	ImVec2 size = ImGui::GetIO().DisplaySize;
 
 	ImGui::SetNextWindowPos(
@@ -132,9 +110,14 @@ bool CrossPlatformGUI::performGUIPass()
     //-----------------------------------------
 
     if(this->_bt.isConnected())
+{
+    unsigned int cap =
+        this->_headphones
+        .getCapabilities();
+
+    if(cap & DEVICE_CAPABILITIES::NC_ASM)
     {
         ImGui::Spacing();
-
         ImGui::Separator();
 
         ImGui::Text(
@@ -144,9 +127,11 @@ bool CrossPlatformGUI::performGUIPass()
         ImGui::Separator();
 
         this->_drawASMControls();
+    }
 
+    if(cap & DEVICE_CAPABILITIES::VPT)
+    {
         ImGui::Spacing();
-
         ImGui::Separator();
 
         ImGui::Text(
@@ -156,12 +141,34 @@ bool CrossPlatformGUI::performGUIPass()
         ImGui::Separator();
 
         this->_drawSurroundControls();
-
-        ImGui::Spacing();
-
-        this->_setHeadphoneSettings();
     }
 
+    if(cap & DEVICE_CAPABILITIES::SPEAK_TO_CHAT)
+    {
+        ImGui::Spacing();
+        ImGui::Separator();
+
+        this->_drawSpeakToChat();
+    }
+
+    if(cap & DEVICE_CAPABILITIES::MULTI_POINT)
+    {
+        ImGui::Spacing();
+        ImGui::Separator();
+
+        this->_drawMultiPointConn();
+    }
+
+    if(cap & DEVICE_CAPABILITIES::OPTIMIZER)
+    {
+        ImGui::Spacing();
+        ImGui::Separator();
+
+        this->_drawOptimizerButton();
+    }
+
+    this->_setHeadphoneSettings();
+    }
     ImGui::Spacing();
 
     ImGui::Separator();
@@ -172,10 +179,29 @@ bool CrossPlatformGUI::performGUIPass()
 
     ImGui::End();
 
+    if(!open)
+    {
+        // detener listener primero
+        this->_listener.reset();
+
+        // cerrar bluetooth para desbloquear reads
+        this->_bt.disconnect();
+
+        // no esperar eternamente
+        if(this->_listenerFuture.valid())
+        {
+            this->_listenerFuture.wait_for(
+                std::chrono::milliseconds(200)
+            );
+        }
+
+        return false;
+    }
+
     //ImGui::Render();
 
     return open;
-}
+    }
 
 
 void CrossPlatformGUI::_drawErrors()
@@ -201,7 +227,6 @@ void CrossPlatformGUI::_drawErrors()
     }
 }
 
-
 void CrossPlatformGUI::_drawDeviceDiscovery()
 {
     static std::vector<BluetoothDevice>
@@ -209,7 +234,11 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
 
     static int selectedDevice=-1;
 
-    if (this->_bt.isConnected())
+    //---------------------------------
+    // Ya conectado
+    //---------------------------------
+
+    if(this->_bt.isConnected())
     {
         ImGui::Text(
             "Connected to:"
@@ -218,23 +247,47 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
         ImGui::SameLine();
 
         ImGui::TextColored(
-            ImVec4(0.2f,0.8f,0.3f,1.0f),
+            ImVec4(
+                0.2f,
+                0.8f,
+                0.3f,
+                1.0f
+            ),
             "%s",
-            this->_connectedDevice.name.c_str()
+            this->_connectedDevice
+            .name.c_str()
         );
 
-        if(ImGui::Button(
-            "Disconnect",
-            ImVec2(150,35)
-        ))
+        if(
+            ImGui::Button(
+                "Disconnect",
+                ImVec2(
+                    150,
+                    35
+                )
+            )
+        )
         {
             selectedDevice=-1;
+            this->_listener.reset();
 
             this->_bt.disconnect();
+
+            if(this->_listenerFuture.valid())
+            {
+                this->_listenerFuture.wait_for(
+                    std::chrono::milliseconds(200)
+                );
+            }
+
         }
 
         return;
     }
+
+    //---------------------------------
+    // Lista dispositivos
+    //---------------------------------
 
     ImGui::Text(
         "Select a device:"
@@ -244,8 +297,10 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
 
     int temp=0;
 
-    for(const auto& device:
-        connectedDevices)
+    for(
+        const auto& device:
+        connectedDevices
+    )
     {
         ImGui::RadioButton(
             device.name.c_str(),
@@ -256,25 +311,40 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
 
     ImGui::Spacing();
 
-    if(this->_connectFuture.valid())
+    //---------------------------------
+    // Estado conexión
+    //---------------------------------
+
+    if(
+        this->_connectFuture
+        .valid()
+    )
     {
-        if(this->_connectFuture.ready())
+        if(
+            this->_connectFuture
+            .ready()
+        )
         {
             try
             {
-                this->_connectFuture.get();
+                this->_connectFuture
+                .get();
             }
             catch(
                 const RecoverableException&
                 exc
             )
             {
-                if(exc.shouldDisconnect)
+                if(
+                    exc.shouldDisconnect
+                )
                 {
-                    this->_bt.disconnect();
+                    this->_bt
+                    .disconnect();
                 }
 
-                this->_mq.addMessage(
+                this->_mq
+                .addMessage(
                     exc.what()
                 );
             }
@@ -288,12 +358,19 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
     }
     else
     {
-        if(ImGui::Button(
-            "Connect",
-            ImVec2(150,35)
-        ))
+        if(
+            ImGui::Button(
+                "Connect",
+                ImVec2(
+                    150,
+                    35
+                )
+            )
+        )
         {
-            if(selectedDevice!=-1)
+            if(
+                selectedDevice!=-1
+            )
             {
                 this->_connectedDevice=
                     connectedDevices[
@@ -305,8 +382,53 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
                 [this]()
                 {
                     this->_bt.connect(
-                    this->_connectedDevice.mac
+                        this
+                        ->_connectedDevice
+                        .mac
                     );
+
+                    //--------------------------------
+                    // crear listener
+                    //--------------------------------
+
+                    this->_listener=
+                    std::make_unique<
+                        Listener
+                    >(
+                        this
+                        ->_headphones,
+                        this
+                        ->_bt
+                    );
+
+                    this
+                    ->_listenerFuture=
+                    std::async(
+                        std::launch
+                        ::async,
+
+                        &Listener
+                        ::listen,
+
+                        this
+                        ->_listener
+                        .get()
+                    );
+
+                    //--------------------------------
+
+                    if(
+                        this
+                        ->_connectedDevice
+                        .name
+                        ==
+                        "WH-1000XM4"
+                    )
+                    {
+                        this
+                        ->_headphones
+                        .queryState();
+                    }
                 });
             }
         }
@@ -314,30 +436,55 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
 
     ImGui::SameLine();
 
-    if(ImGui::Button(
-        "Refresh",
-        ImVec2(150,35)
-    ))
+    //---------------------------------
+    // Refresh
+    //---------------------------------
+
+    if(
+        ImGui::Button(
+            "Refresh",
+            ImVec2(
+                150,
+                35
+            )
+        )
+    )
     {
         selectedDevice=-1;
 
-        this->_connectedDevicesFuture
+        this
+        ->_connectedDevicesFuture
         .setFromAsync(
         [this]()
         {
-            return this->_bt
+            return
+            this
+            ->_bt
             .getConnectedDevices();
         });
     }
 
-    if(this->_connectedDevicesFuture.valid())
+    //---------------------------------
+    // Obtener resultados
+    //---------------------------------
+
+    if(
+        this
+        ->_connectedDevicesFuture
+        .valid()
+    )
     {
-        if(this->_connectedDevicesFuture.ready())
+        if(
+            this
+            ->_connectedDevicesFuture
+            .ready()
+        )
         {
             try
             {
                 connectedDevices=
-                this->_connectedDevicesFuture
+                this
+                ->_connectedDevicesFuture
                 .get();
             }
             catch(
@@ -345,14 +492,15 @@ void CrossPlatformGUI::_drawDeviceDiscovery()
                 exc
             )
             {
-                this->_mq.addMessage(
+                this
+                ->_mq
+                .addMessage(
                     exc.what()
                 );
             }
         }
     }
 }
-
 
 void CrossPlatformGUI::_drawASMControls()
 {

@@ -50,6 +50,7 @@ private:
 	Headphones _headphones;
 	// Listener _listener;
 	std::unique_ptr<Listener> _listener;
+	std::future<void> _listenerFuture;
 };
 
 
