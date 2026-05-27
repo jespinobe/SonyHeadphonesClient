@@ -1,104 +1,123 @@
 #!/bin/bash
-
 set -e
 
-PROJECT="$HOME/SonyHeadphonesClient"
-BUILD="$PROJECT/Client/build"
-INSTALL_DIR="/opt/sony-headphones-client"
+APP_NAME="SonyHeadphonesClient"
+INSTALL_DIR="/opt/$APP_NAME"
+ICON_NAME="sony-headphones"
 
-APP_NAME="Sony Headphones Client"
-BIN_NAME="SonyHeadphonesClient"
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-echo "== Instalando $APP_NAME =="
+echo "=================================="
+echo "Sony Headphones Client Installer"
+echo "=================================="
 
-# Verificar binario
-if [ ! -f "$BUILD/$BIN_NAME" ]; then
-    echo "ERROR: no existe:"
-    echo "$BUILD/$BIN_NAME"
-    echo ""
-    echo "Compila primero:"
-    echo "cd $BUILD"
-    echo "cmake --build . -j\$(nproc)"
-    exit 1
-fi
+echo ""
+echo "[1/5] Compilando..."
 
-echo "Creando directorio..."
+cd "$PROJECT_ROOT/Client"
+
+mkdir -p build
+cd build
+
+cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+cmake --build . -j$(nproc)
+
+echo ""
+echo "[2/5] Instalando / actualizando..."
 
 sudo mkdir -p "$INSTALL_DIR"
 
-echo "Copiando ejecutable..."
+sudo install -m755 \
+SonyHeadphonesClient \
+"$INSTALL_DIR/SonyHeadphonesClient"
 
-sudo cp \
-"$BUILD/$BIN_NAME" \
-"$INSTALL_DIR/"
 
-sudo chmod +x \
-"$INSTALL_DIR/$BIN_NAME"
+echo ""
+echo "[3/5] Instalando icono..."
 
-echo "Buscando icono..."
-
-ICON=$(find "$PROJECT" \
--type f \
-\( -iname "*.png" \
--o -iname "*.svg" \
--o -iname "*.jpg" \) \
-| head -n1)
-
-if [ -n "$ICON" ]; then
-
-    EXT="${ICON##*.}"
-
-    sudo cp \
-    "$ICON" \
-    "$INSTALL_DIR/icon.$EXT"
-
-    ICON_PATH="$INSTALL_DIR/icon.$EXT"
-
-    echo "Icono encontrado:"
-    echo "$ICON"
-
-else
-
-    ICON_PATH="utilities-terminal"
-
-    echo "No encontré icono."
-    echo "Usando icono del sistema."
-
+if [ ! -f "$PROJECT_ROOT/static/sony-headphones.png" ]
+then
+    echo ""
+    echo "ERROR:"
+    echo "No existe:"
+    echo "$PROJECT_ROOT/static/sony-headphones.png"
+    exit 1
 fi
 
-echo "Creando acceso menú..."
+sudo mkdir -p \
+/usr/share/icons/hicolor/512x512/apps
 
-cat > /tmp/sony-headphones.desktop <<EOF
+sudo cp -f \
+"$PROJECT_ROOT/static/sony-headphones.png" \
+/usr/share/icons/hicolor/512x512/apps/$ICON_NAME.png
+
+sudo cp -f \
+"$PROJECT_ROOT/static/sony-headphones.png" \
+/usr/share/pixmaps/$ICON_NAME.png
+
+
+# eliminar restos viejos
+rm -f ~/.local/share/icons/$ICON_NAME*
+rm -f ~/.local/share/applications/sony-headphones.desktop
+
+rm -rf ~/.cache/thumbnails/*
+rm -rf ~/.cache/gnome-software/*
+rm -rf ~/.cache/icon-cache.kcache*
+rm -rf ~/.cache/*icon*
+
+
+echo ""
+echo "[4/5] Creando launcher..."
+
+sudo tee \
+/usr/share/applications/sony-headphones.desktop \
+>/dev/null <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=$APP_NAME
-Comment=Unofficial Sony WH Headphones Client
-Exec=$INSTALL_DIR/$BIN_NAME
-Icon=$ICON_PATH
+Name=Sony Headphones Client
+Comment=Sony Headphones Desktop Client
+Exec=$INSTALL_DIR/SonyHeadphonesClient
+Icon=$ICON_NAME
 Terminal=false
 Categories=Audio;Utility;
 StartupNotify=true
 EOF
 
-mkdir -p ~/.local/share/applications
 
-cp \
-/tmp/sony-headphones.desktop \
-~/.local/share/applications/
+echo ""
+echo "[5/5] Refrescando GNOME..."
 
-chmod +x \
-~/.local/share/applications/sony-headphones.desktop
-
-update-desktop-database \
-~/.local/share/applications \
+sudo update-desktop-database \
+/usr/share/applications \
 2>/dev/null || true
 
+sudo gtk-update-icon-cache \
+-f \
+-t \
+/usr/share/icons/hicolor \
+2>/dev/null || true
+
+sudo touch /usr/share/icons/hicolor
+
+
+# GNOME es muy agresivo cacheando iconos
+#if pgrep -x gnome-shell >/dev/null
+#then
+#    echo "Reiniciando GNOME Shell..."
+#    
+#    killall gnome-shell \
+#    2>/dev/null || true
+
+#    nohup gnome-shell --replace \
+#    >/dev/null 2>&1 &
+#fi
+
 echo ""
-echo "Instalación completada"
+echo "=================================="
+echo "Instalación completa"
+echo "=================================="
+
 echo ""
-echo "Ahora busca:"
-echo ""
-echo "Sony Headphones Client"
-echo ""
-echo "en el menú de aplicaciones."
+echo "Abrir desde:"
+echo "Aplicaciones → Sony Headphones Client"
